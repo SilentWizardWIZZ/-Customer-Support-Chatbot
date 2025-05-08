@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Amazon Customer Support</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .chat-message {
+            animation: fadeIn 0.3s ease-out;
+        }
+        .typing-indicator span {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #666;
+            margin: 0 2px;
+        }
+        .typing-indicator span:nth-child(1) {
+            animation: bounce 1s infinite;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation: bounce 1s infinite 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation: bounce 1s infinite 0.4s;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+    </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <div class="container mx-auto max-w-6xl p-4">
+        <!-- Header -->
+        <header class="bg-white shadow-sm rounded-lg mb-6 p-4 flex items-center">
+            <div class="flex items-center">
+                <i class="fab fa-amazon text-3xl text-orange-500 mr-3"></i>
+                <h1 class="text-xl font-bold text-gray-800">Amazon Customer Support</h1>
+            </div>
+            <div class="ml-auto flex items-center space-x-2">
+                <span class="text-sm text-gray-500">Live chat</span>
+                <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            </div>
+        </header>
+
+        <!-- Chat Container -->
+        <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+            <!-- Chat Header -->
+            <div class="bg-gray-800 text-white p-4 flex items-center">
+                <div class="w-10 h-10 rounded-full bg-orange-500 flex items-center justify-center">
+                    <i class="fas fa-robot text-white text-xl"></i>
+                </div>
+                <div class="ml-3">
+                    <h2 class="font-semibold">Amazon Assistant</h2>
+                    <p class="text-xs text-gray-300">Typically replies in seconds</p>
+                </div>
+                <div class="ml-auto flex space-x-2">
+                    <button class="p-2 rounded-full hover:bg-gray-700">
+                        <i class="fas fa-phone-alt text-gray-300"></i>
+                    </button>
+                    <button class="p-2 rounded-full hover:bg-gray-700">
+                        <i class="fas fa-ellipsis-v text-gray-300"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Chat Messages -->
+            <div id="chat-container" class="h-96 overflow-y-auto p-4 space-y-4 bg-gray-50">
+                <!-- Initial bot message -->
+                <div class="chat-message">
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center mr-2">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                            <p class="text-gray-800">Hello! I'm your Amazon Assistant. How can I help you today?</p>
+                            <p class="text-xs text-gray-500 mt-1">Just now</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick reply options -->
+                <div class="chat-message">
+                    <div class="flex justify-center">
+                        <div class="bg-white p-2 rounded-lg shadow-sm inline-block">
+                            <p class="text-xs text-gray-500 mb-2">Quick options:</p>
+                            <div class="flex flex-wrap gap-2">
+                                <button onclick="quickReply('Track my order')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full">Track my order</button>
+                                <button onclick="quickReply('Return an item')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full">Return an item</button>
+                                <button onclick="quickReply('Product question')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full">Product question</button>
+                                <button onclick="quickReply('Account issue')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full">Account issue</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Typing indicator (hidden by default) -->
+            <div id="typing-indicator" class="hidden bg-gray-50 px-4 py-2">
+                <div class="flex items-start">
+                    <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center mr-2">
+                        <i class="fas fa-robot text-white text-sm"></i>
+                    </div>
+                    <div class="typing-indicator bg-white p-3 rounded-lg shadow-sm">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Input Area -->
+            <div class="border-t border-gray-200 p-4 bg-white">
+                <div class="flex items-center">
+                    <button class="p-2 text-gray-500 hover:text-gray-700">
+                        <i class="far fa-smile"></i>
+                    </button>
+                    <button class="p-2 text-gray-500 hover:text-gray-700">
+                        <i class="fas fa-paperclip"></i>
+                    </button>
+                    <input id="user-input" type="text" placeholder="Type your message..." 
+                        class="flex-1 border border-gray-300 rounded-full px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent mx-2">
+                    <button onclick="sendMessage()" class="p-2 bg-orange-500 text-white rounded-full hover:bg-orange-600">
+                        <i class="fas fa-paper-plane"></i>
+                    </button>
+                </div>
+                <p class="text-xs text-gray-500 mt-2">By using this chat, you agree to our <a href="#" class="text-orange-500">Terms of Service</a></p>
+            </div>
+        </div>
+
+        <!-- Help Topics -->
+        <div class="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center mb-2">
+                    <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center mr-3">
+                        <i class="fas fa-truck text-blue-500"></i>
+                    </div>
+                    <h3 class="font-semibold">Orders & Shipping</h3>
+                </div>
+                <p class="text-sm text-gray-600">Track packages, check delivery status, or report missing items.</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center mb-2">
+                    <div class="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center mr-3">
+                        <i class="fas fa-exchange-alt text-green-500"></i>
+                    </div>
+                    <h3 class="font-semibold">Returns & Refunds</h3>
+                </div>
+                <p class="text-sm text-gray-600">Start a return, check refund status, or print return labels.</p>
+            </div>
+            <div class="bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                <div class="flex items-center mb-2">
+                    <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center mr-3">
+                        <i class="fas fa-question-circle text-purple-500"></i>
+                    </div>
+                    <h3 class="font-semibold">Product Questions</h3>
+                </div>
+                <p class="text-sm text-gray-600">Get product details, specifications, or compatibility information.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample responses for different queries
+        const responses = {
+            "track my order": {
+                text: "To track your order, I'll need your order number. You can find it in your order confirmation email. Would you like me to look it up for you?",
+                options: [
+                    {text: "Yes, please help", value: "look up order"},
+                    {text: "I have my order number", value: "enter order number"}
+                ]
+            },
+            "return an item": {
+                text: "I can help you start a return. Please tell me which item you'd like to return and the reason for return.",
+                options: [
+                    {text: "Damaged item", value: "return damaged item"},
+                    {text: "Wrong item received", value: "return wrong item"},
+                    {text: "No longer needed", value: "return no longer needed"}
+                ]
+            },
+            "product question": {
+                text: "I can help with product questions. Please tell me which product you're inquiring about and your specific question.",
+                options: [
+                    {text: "Specifications", value: "product specifications"},
+                    {text: "Compatibility", value: "product compatibility"},
+                    {text: "Availability", value: "product availability"}
+                ]
+            },
+            "account issue": {
+                text: "For account-related issues, I can help with password reset, login problems, or account security. What specific issue are you experiencing?",
+                options: [
+                    {text: "Can't log in", value: "login issue"},
+                    {text: "Password reset", value: "password reset"},
+                    {text: "Suspicious activity", value: "account security"}
+                ]
+            },
+            "default": {
+                text: "I'm sorry, I didn't understand that. Could you please rephrase your question or choose from these options?",
+                options: [
+                    {text: "Track my order", value: "Track my order"},
+                    {text: "Return an item", value: "Return an item"},
+                    {text: "Product question", value: "Product question"},
+                    {text: "Account issue", value: "Account issue"}
+                ]
+            }
+        };
+
+        // Quick reply function
+        function quickReply(text) {
+            document.getElementById('user-input').value = text;
+            sendMessage();
+        }
+
+        // Send message function
+        function sendMessage() {
+            const input = document.getElementById('user-input');
+            const message = input.value.trim();
+            
+            if (message === '') return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            input.value = '';
+            
+            // Show typing indicator
+            document.getElementById('typing-indicator').classList.remove('hidden');
+            
+            // Simulate bot thinking
+            setTimeout(() => {
+                document.getElementById('typing-indicator').classList.add('hidden');
+                
+                // Process message and get response
+                const lowerMessage = message.toLowerCase();
+                let response = responses.default;
+                
+                for (const key in responses) {
+                    if (lowerMessage.includes(key)) {
+                        response = responses[key];
+                        break;
+                    }
+                }
+                
+                // Add bot response
+                addMessage(response.text, 'bot');
+                
+                // Add quick reply options if available
+                if (response.options && response.options.length > 0) {
+                    addQuickReplies(response.options);
+                }
+                
+                // Scroll to bottom
+                const chatContainer = document.getElementById('chat-container');
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }, 1000 + Math.random() * 2000); // Random delay between 1-3 seconds
+        }
+
+        // Add message to chat
+        function addMessage(text, sender) {
+            const chatContainer = document.getElementById('chat-container');
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'chat-message';
+            
+            if (sender === 'user') {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start justify-end">
+                        <div class="bg-orange-500 p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                            <p class="text-white">${text}</p>
+                            <p class="text-xs text-orange-100 mt-1 text-right">Just now</p>
+                        </div>
+                        <div class="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center ml-2">
+                            <i class="fas fa-user text-gray-600 text-sm"></i>
+                        </div>
+                    </div>
+                `;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex items-start">
+                        <div class="w-8 h-8 rounded-full bg-orange-500 flex items-center justify-center mr-2">
+                            <i class="fas fa-robot text-white text-sm"></i>
+                        </div>
+                        <div class="bg-white p-3 rounded-lg shadow-sm max-w-xs md:max-w-md">
+                            <p class="text-gray-800">${text}</p>
+                            <p class="text-xs text-gray-500 mt-1">Just now</p>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Add quick reply options
+        function addQuickReplies(options) {
+            const chatContainer = document.getElementById('chat-container');
+            
+            const quickRepliesDiv = document.createElement('div');
+            quickRepliesDiv.className = 'chat-message';
+            
+            let buttonsHTML = '';
+            options.forEach(option => {
+                buttonsHTML += `<button onclick="quickReply('${option.value}')" class="bg-gray-100 hover:bg-gray-200 text-gray-800 text-xs px-3 py-1 rounded-full">${option.text}</button>`;
+            });
+            
+            quickRepliesDiv.innerHTML = `
+                <div class="flex justify-center">
+                    <div class="bg-white p-2 rounded-lg shadow-sm inline-block">
+                        <p class="text-xs text-gray-500 mb-2">Quick options:</p>
+                        <div class="flex flex-wrap gap-2">
+                            ${buttonsHTML}
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            chatContainer.appendChild(quickRepliesDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Handle Enter key press
+        document.getElementById('user-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
